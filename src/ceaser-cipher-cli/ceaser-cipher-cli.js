@@ -1,62 +1,76 @@
-const { program } = require('commander');
+const options = require('./options');
 const fs = require('fs');
 
-const cipher = str => str.toUpperCase();
+const cipher = require('./cipher');
 
-program.storeOptionsAsProperties(false);
-
-program
-  .requiredOption('-s, --shift <type>', ' a shift')
-  .option('-i, --input <type>', 'an input file')
-  .option('-o, --output <type>', 'an output file')
-  .requiredOption('-a, --action  <type>', 'an action encode/decode');
-
-program.parse(process.argv);
-
-if (program.opts().input === undefined && program.opts().output === undefined) {
-  process.stdout.write('Input: ');
-  process.stdout.write(' >>>> ');
-  process.stdin.on('data', data => {
-    process.stdout.write(cipher(data.toString()));
+const run = args => {
+  if (args.input === undefined && args.output === undefined) {
     process.stdout.write('Input: ');
     process.stdout.write(' >>>> ');
-  });
-} else if (program.opts().input === undefined && program.opts().output) {
-  process.stdout.write('Input: ');
-  process.stdout.write(' >>>> ');
-  process.stdin.on('data', data => {
-    fs.appendFile(
-      `src/ceaser-cipher-cli/${program.opts().output}`,
-      cipher(data.toString()),
-      err => {
-        if (err) console.error(err);
+    process.stdin.on('data', data => {
+      const result = cipher(args.action.toString(), data.toString());
+      if (result === 'Invalid action!') {
+        throw new Error('Invalid action!');
+      } else {
+        process.stdout.write(result);
+        process.stdout.write('Input: ');
+        process.stdout.write(' >>>> ');
       }
-    );
-    process.stdout.write('Successes! \n');
+    });
+  } else if (args.input === undefined && args.output) {
     process.stdout.write('Input: ');
     process.stdout.write(' >>>> ');
-  });
-} else if (program.opts().output === undefined && program.opts().input) {
-  const readStream = fs.createReadStream(
-    `src/ceaser-cipher-cli/${program.opts().input}`,
-    'utf8'
-  );
-  readStream.on('data', data => {
-    process.stdout.write(cipher(data.toString()));
-  });
-} else {
-  const readStream = fs.createReadStream(
-    `src/ceaser-cipher-cli/${program.opts().input}`,
-    'utf8'
-  );
-  readStream.on('data', data => {
-    fs.appendFile(
-      `src/ceaser-cipher-cli/${program.opts().output}`,
-      cipher(data.toString()),
-      err => {
-        if (err) console.error(err);
-      },
-      console.log('Successes!')
+    process.stdin.on('data', data => {
+      const result = cipher(args.action.toString(), data.toString());
+      if (result === 'Invalid action!') {
+        throw new Error('Invalid action!');
+      } else {
+        fs.appendFile(
+          `src/ceaser-cipher-cli/${args.output}`,
+          cipher(args.action.toString(), data.toString()),
+          err => {
+            if (err) console.error(err);
+          }
+        );
+        process.stdout.write('Successes! \n');
+        process.stdout.write('Input: ');
+        process.stdout.write(' >>>> ');
+      }
+    });
+  } else if (args.output === undefined && args.input) {
+    const readStream = fs.createReadStream(
+      `src/ceaser-cipher-cli/${args.input}`,
+      'utf8'
     );
-  });
-}
+    readStream.on('data', data => {
+      const result = cipher(args.action.toString(), data.toString());
+      if (result === 'Invalid action!') {
+        throw new Error('Invalid action!');
+      } else {
+        process.stdout.write(result);
+      }
+    });
+  } else {
+    const readStream = fs.createReadStream(
+      `src/ceaser-cipher-cli/${args.input}`,
+      'utf8'
+    );
+    readStream.on('data', data => {
+      const result = cipher(args.action.toString(), data.toString());
+      if (result === 'Invalid action!') {
+        throw new Error('Invalid action!');
+      } else {
+        fs.appendFile(
+          `src/ceaser-cipher-cli/${args.output}`,
+          result,
+          err => {
+            if (err) console.error(err);
+          },
+          console.log('Successes!')
+        );
+      }
+    });
+  }
+};
+
+run(options);
