@@ -1,4 +1,5 @@
 const uuid = require('uuid');
+// const Task = require('../tasks/task.model');
 
 class Column {
   constructor({ id = uuid(), title = 'TITLE', order = 1 } = {}) {
@@ -7,6 +8,7 @@ class Column {
     this.order = order;
   }
 }
+
 class Board {
   constructor({ id = uuid(), title = 'TITLE', columns = [new Column()] } = {}) {
     this.id = id;
