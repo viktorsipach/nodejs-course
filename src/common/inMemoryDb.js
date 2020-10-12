@@ -32,6 +32,9 @@ const updateUser = async (id, data) => {
 
 const deleteUser = async id => {
   DB.users.filter(el => el.id !== id);
+  DB.tasks.forEach(el => {
+    el.userId = null;
+  });
   return DB.users.slice(0);
 };
 
@@ -58,34 +61,23 @@ const updateBoard = async (id, data) => {
 };
 
 const deleteBoard = async id => {
-  const board = DB.boards.filter(el => el.id !== id)[0];
-  board.columns.length = 0;
   DB.boards.filter(el => el.id !== id);
+  DB.tasks.filter(el => el.boardId !== id);
   return DB.boards.slice(0);
 };
 
 // Tasks
 
 const getAllTasks = async id => {
-  const tasks = [];
-  DB.tasks.filter(el => el.boardId === id);
-  DB.boards.forEach(el => {
-    el.columns.forEach(element => {
-      tasks.push(element);
-    });
-  });
+  const tasks = DB.tasks.filter(el => el.boardId === id);
   return tasks;
 };
 
 const getTask = async id => DB.tasks.filter(el => el.id === id)[0];
 
-const createTask = async (id, task) => {
-  const board = await getBoard(id);
-  task.boardId = id;
-  board.columns.push(task);
-  DB.boards.filter(el => el.id !== id);
-  DB.boards.push(board);
-  return board;
+const createTask = async task => {
+  DB.tasks.push(task);
+  return task;
 };
 
 const updateTask = async (id, data) => {
@@ -101,8 +93,8 @@ const updateTask = async (id, data) => {
   return task;
 };
 
-const deleteTask = async id => {
-  DB.tasks.filter(el => el.id !== id);
+const deleteTask = async (id, boardId) => {
+  DB.tasks.filter(el => el.id !== id && el.boardId !== boardId);
   return DB.tasks.slice(0);
 };
 

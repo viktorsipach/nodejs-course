@@ -12,16 +12,16 @@ const get = async id => {
   return user;
 };
 
-const create = async (id, task) => {
-  return DB.createTask(id, task);
+const create = async task => {
+  return DB.createTask(task);
 };
 
 const update = async (id, data) => {
   return DB.updateTask(id, data);
 };
 
-const deleteTask = async id => {
-  return DB.deleteTask(id);
+const deleteTask = async (id, boardId) => {
+  return DB.deleteTask(id, boardId);
 };
 
 module.exports = { getAll, get, create, update, deleteTask };

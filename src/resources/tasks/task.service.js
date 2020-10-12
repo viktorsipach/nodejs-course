@@ -4,10 +4,10 @@ const getAll = id => tasksRepo.getAll(id);
 
 const get = id => tasksRepo.get(id);
 
-const create = (id, task) => tasksRepo.create(id, task);
+const create = task => tasksRepo.create(task);
 
 const update = (id, data) => tasksRepo.update(id, data);
 
-const deleteTask = id => tasksRepo.deleteUser(id);
+const deleteTask = (id, boardId) => tasksRepo.deleteTask(id, boardId);
 
 module.exports = { getAll, get, create, update, deleteTask };
