@@ -12,7 +12,7 @@ router.route('/:id').get(async (req, res) => {
     const board = await boardsService.get(req.params.id);
     res.json(board);
   } catch (error) {
-    res.status(404).send('Not Found');
+    res.status(404).send(error.massage);
   }
 });
 
@@ -35,9 +35,9 @@ router.route('/:id').put(async (req, res) => {
 router.route('/:id').delete(async (req, res) => {
   try {
     await boardsService.deleteBoard(req.params.id);
-    res.status(200).send('Ok');
+    res.status(204).send('BOARD SUCCESSFULLY DELETED!!!');
   } catch (error) {
-    res.status(404).send('Not Found');
+    res.status(404).send(error.massage);
   }
 });
 

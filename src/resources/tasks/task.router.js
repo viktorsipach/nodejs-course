@@ -13,7 +13,8 @@ router.route('/').get(async (req, res) => {
 
 router.route('/:id').get(async (req, res) => {
   try {
-    const task = await tasksService.get(req.params.id);
+    const { id, boardId } = req.params;
+    const task = await tasksService.get(id, boardId);
     res.json(task);
   } catch (error) {
     res.status(404).send('Not Found');
@@ -37,18 +38,18 @@ router.route('/').post(async (req, res) => {
 });
 
 router.route('/:id').put(async (req, res) => {
-  const task = await tasksService.update(req.params.id, req.body);
+  const { id, boardId } = req.params;
+  const data = req.body;
+  const task = await tasksService.update(id, boardId, data);
 
   res.json(task);
 });
 
 router.route('/:id').delete(async (req, res) => {
   try {
-    const { boardId } = req.params;
-    const { id } = req.params;
-    const tasks = await tasksService.deleteTask(id, boardId);
-    res.json(tasks);
-    res.status(200).send('Ok');
+    const { id, boardId } = req.params;
+    await tasksService.deleteTask(id, boardId);
+    res.status(204).send('TASK SUCCESSFULLY DELETED!!!');
   } catch (error) {
     res.status(404).send('Not Found');
   }
