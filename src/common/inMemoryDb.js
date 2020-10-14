@@ -61,9 +61,20 @@ const updateBoard = async (id, data) => {
 };
 
 const deleteBoard = async id => {
-  DB.boards.filter(el => el.id !== id);
-  DB.tasks.filter(el => el.boardId !== id);
-  return DB.boards.slice(0);
+  const board = await getBoard(id);
+  const tasks = await removeTasksFromBoard(board.id);
+  tasks.forEach(el => {
+    deleteTask(el.id, el.boardId);
+  });
+  const boardIndex = DB.boards.findIndex(_board => {
+    return _board.id === id;
+  });
+
+  if (boardIndex >= 0) {
+    DB.boards.splice(boardIndex, 1);
+    return board;
+  }
+  return false;
 };
 
 // Tasks
@@ -73,15 +84,16 @@ const getAllTasks = async id => {
   return tasks;
 };
 
-const getTask = async id => DB.tasks.filter(el => el.id === id)[0];
+const getTask = async (id, boardId) =>
+  DB.tasks.filter(el => el.id === id && el.boardId === boardId)[0];
 
 const createTask = async task => {
   DB.tasks.push(task);
   return task;
 };
 
-const updateTask = async (id, data) => {
-  const task = await getTask(id);
+const updateTask = async (id, boardId, data) => {
+  const task = await getTask(id, boardId);
   task.title = data.title;
   task.order = data.order;
   task.description = data.description;
@@ -94,8 +106,21 @@ const updateTask = async (id, data) => {
 };
 
 const deleteTask = async (id, boardId) => {
-  DB.tasks.filter(el => el.id !== id && el.boardId !== boardId);
-  return DB.tasks.slice(0);
+  const task = await getTask(id, boardId);
+  const taskIndex = DB.tasks.findIndex(_task => {
+    return _task.id === id && _task.boardId === boardId;
+  });
+
+  if (taskIndex >= 0) {
+    DB.tasks.splice(taskIndex, 1);
+    return task;
+  }
+  return false;
+};
+
+const removeTasksFromBoard = async boardId => {
+  const tasks = DB.tasks.filter(task => task.boardId === boardId);
+  return tasks;
 };
 
 module.exports = {
@@ -113,5 +138,6 @@ module.exports = {
   getTask,
   createTask,
   updateTask,
-  deleteTask
+  deleteTask,
+  removeTasksFromBoard
 };
