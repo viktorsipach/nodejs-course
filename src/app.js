@@ -1,7 +1,10 @@
 const express = require('express');
 const swaggerUI = require('swagger-ui-express');
+const morganBody = require('morgan-body');
+const bodyParser = require('body-parser');
 const path = require('path');
 const YAML = require('yamljs');
+
 const userRouter = require('./resources/users/user.router');
 const boardRouter = require('./resources/boards/board.router');
 const taskRouter = require('./resources/tasks/task.router');
@@ -13,11 +16,16 @@ app.use(express.json());
 
 app.use('/doc', swaggerUI.serve, swaggerUI.setup(swaggerDocument));
 
+app.use(bodyParser.json());
+
+morganBody(app);
+
 app.use('/', (req, res, next) => {
   if (req.originalUrl === '/') {
     res.send('Service is running!');
     return;
   }
+
   next();
 });
 

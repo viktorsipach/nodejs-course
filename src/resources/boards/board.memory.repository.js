@@ -1,17 +1,17 @@
 const DB = require('../../common/inMemoryDb');
+const NotFoundError = require('../../utils/errorClass');
+
+const ENTITY = 'board';
 
 const getAll = async () => {
   const boards = await DB.getAllBoards();
-  if (!boards.length) {
-    throw new Error('The boards with was not found!');
-  }
   return boards;
 };
 
 const get = async id => {
   const board = await DB.getBoard(id);
   if (!board) {
-    throw new Error(`The board with id: ${id} was not found!`);
+    throw new NotFoundError(ENTITY, id);
   }
 
   return board;
@@ -29,7 +29,7 @@ const deleteBoard = async id => {
   const board = await DB.deleteBoard(id);
   await DB.removeTasksFromBoard(board.id);
   if (!board) {
-    throw new Error(`The board with id: ${id} was not found`);
+    throw new NotFoundError(ENTITY, id);
   }
   return board;
 };
