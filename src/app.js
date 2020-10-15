@@ -33,4 +33,12 @@ app.use('/users', userRouter);
 app.use('/boards', boardRouter);
 boardRouter.use('/:boardId/tasks', taskRouter);
 
+process
+  .on('unhandledRejection', (reason, p) => {
+    console.error(reason, p);
+  })
+  .on('uncaughtException', err => {
+    console.error(err);
+  });
+
 module.exports = app;
