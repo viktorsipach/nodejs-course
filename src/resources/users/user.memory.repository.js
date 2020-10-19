@@ -1,14 +1,15 @@
 const DB = require('../../common/inMemoryDb');
+const NotFoundError = require('../../utils/errorClass');
+
+const ENTITY = 'user';
 
 const getAll = async () => DB.getAllUsers();
 
 const get = async id => {
   const user = DB.getUser(id);
-
   if (!user) {
-    throw new Error(`The user with id: ${id} was not found!`);
+    throw new NotFoundError(ENTITY, id);
   }
-
   return user;
 };
 
