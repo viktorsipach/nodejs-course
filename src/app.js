@@ -1,9 +1,8 @@
 const express = require('express');
 const swaggerUI = require('swagger-ui-express');
-const morganBody = require('morgan-body');
-const bodyParser = require('body-parser');
 const path = require('path');
 const YAML = require('yamljs');
+const morgan = require('morgan');
 
 const userRouter = require('./resources/users/user.router');
 const boardRouter = require('./resources/boards/board.router');
@@ -16,9 +15,31 @@ app.use(express.json());
 
 app.use('/doc', swaggerUI.serve, swaggerUI.setup(swaggerDocument));
 
-app.use(bodyParser.json());
+morgan.token('query', req => JSON.stringify(req.query));
 
-morganBody(app);
+morgan.token('body', req => JSON.stringify(req.body));
+
+app.use(
+  morgan(
+    'error: :method :status :url Query :query Body :body - :response-time ms',
+    {
+      skip(req, res) {
+        return res.statusCode < 400;
+      }
+    }
+  )
+);
+
+app.use(
+  morgan(
+    'info: :method :status :url Query :query Body :body - :response-time ms',
+    {
+      skip(req, res) {
+        return res.statusCode > 400;
+      }
+    }
+  )
+);
 
 app.use('/', (req, res, next) => {
   if (req.originalUrl === '/') {
