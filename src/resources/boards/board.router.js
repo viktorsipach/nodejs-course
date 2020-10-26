@@ -37,7 +37,7 @@ router.route('/:id').put(async (req, res) => {
 
 router.route('/:id').delete(async (req, res) => {
   handleRoute(async () => {
-    await boardsService.deleteBoard(req.params.id);
+    await boardsService.remove(req.params.id);
     res.status(204).send('BOARD SUCCESSFULLY DELETED!');
   }, res);
 });
