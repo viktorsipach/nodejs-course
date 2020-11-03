@@ -38,6 +38,10 @@ const deleteUser = async id => {
   return DB.users.slice(0);
 };
 
+const checkUserByLogin = async login => {
+  return User.findOne({ login }).exec();
+};
+
 // Boards
 
 DB.boards.push(new Board(), new Board(), new Board());
@@ -139,5 +143,6 @@ module.exports = {
   createTask,
   updateTask,
   deleteTask,
-  removeTasksFromBoard
+  removeTasksFromBoard,
+  checkUserByLogin
 };

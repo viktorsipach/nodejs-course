@@ -7,6 +7,8 @@ const morgan = require('morgan');
 const userRouter = require('./resources/users/user.router');
 const boardRouter = require('./resources/boards/board.router');
 const taskRouter = require('./resources/tasks/task.router');
+const loginRouter = require('./resources/login/login.router');
+const auth = require('./common/auth.js');
 
 const app = express();
 const swaggerDocument = YAML.load(path.join(__dirname, '../doc/api.yaml'));
@@ -47,6 +49,29 @@ app.use('/', (req, res, next) => {
     return;
   }
 
+  next();
+});
+
+app.use('/login', loginRouter);
+
+app.all('*', (req, res, next) => {
+  /*
+  if (req.originalUrl === '/users' && req.method === 'POST') {
+    next();
+    return;
+  }
+  */
+  if (req.get('Authorization') !== undefined) {
+    const token = req.headers.authorization.slice(7);
+    const decoded = auth.decodeToken(token);
+    if (typeof decoded === 'string') {
+      res.status(401).send(`Please send correct jwt token. ${decoded}`);
+      return;
+    }
+  } else {
+    res.status(401).send('Please Login');
+    return;
+  }
   next();
 });
 
